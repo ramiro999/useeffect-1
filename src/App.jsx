@@ -1,42 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { useFetch } from "./hooks/useFetch";
 
 const App = () => {
   const [counter, setCounter] = useState(0);
-  const [users, setUsers] = useState(null);
+  console.log("App");
 
-  const fetchData = useCallback(async () => {
-    console.log("fetchData");
-    try {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/users"
-      );
-      if (!response.ok) {
-        throw "Error al conectar la API";
-      }
-      const data = await response.json();
-      setUsers(data);
-    } catch (error) {
-      console.log(error);
-      setUsers([]);
-    }
-  }, []);
+  const { data, loading, error } = useFetch(
+    "https://jsonplaceholder.typicode.com/users"
+  );
 
-  // useEffect(() => {
-  //   console.log("useEffect");
-  //   fetch("https://jsonplaceholder.typicode.com/users")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       setUsers(data);
-  //     });
-  // }, []);
-
-  useEffect(() => {
-    console.log("useEffect");
-    fetchData();
-  });
-
-  if (!users) return <div>Cargando...</div>;
-
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <p>{error}</p>;
   return (
     <>
       <h1>UseEffect</h1>
@@ -44,7 +18,7 @@ const App = () => {
         Counter: {counter}
       </button>
       <ul>
-        {users.map((user) => (
+        {data.map((user) => (
           <li key={user.id}>{user.name}</li>
         ))}
       </ul>
